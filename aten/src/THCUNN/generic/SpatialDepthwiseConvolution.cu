@@ -69,22 +69,11 @@ void THNN_(SpatialDepthwiseConvolution_updateOutput)(
   int blocks = GET_BLOCKS(n);
   dim3 grid(blocks);
   dim3 block(CUDA_NUM_THREADS);
-  if (kW == 3 && kH == 3) {
-  spatialDepthwiseConvolutionUpdateOutput<scalar_t, accreal, unsigned int, 3><<<grid, block, 0, THCState_getCurrentStream(state)>>>(
+
+  spatialDepthwiseConvolutionUpdateOutput<scalar_t, accreal, unsigned int, kW, kH><<<grid, block, 0, THCState_getCurrentStream(state)>>>(
     dInput, dOutput, dWeight, dBias, bias != NULL, n, outputChannels, depthwiseMultiplier,
-    width, height, outputWidth, outputHeight,
-    kW, kH, dW, dH, padW, padH, dilationW, dilationH);
-  } else if (kW == 1 && kH == 1) {
-  spatialDepthwiseConvolutionUpdateOutput<scalar_t, accreal, unsigned int, 1><<<grid, block, 0, THCState_getCurrentStream(state)>>>(
-    dInput, dOutput, dWeight, dBias, bias != NULL, n, outputChannels, depthwiseMultiplier,
-    width, height, outputWidth, outputHeight,
-    kW, kH, dW, dH, padW, padH, dilationW, dilationH);
-  } else {
-  spatialDepthwiseConvolutionUpdateOutput<scalar_t, accreal, unsigned int, 0><<<grid, block, 0, THCState_getCurrentStream(state)>>>(
-    dInput, dOutput, dWeight, dBias, bias != NULL, n, outputChannels, depthwiseMultiplier,
-    width, height, outputWidth, outputHeight,
-    kW, kH, dW, dH, padW, padH, dilationW, dilationH);
-  }
+    width, height, outputWidth, outputHeight, 
+    dW, dH, padW, padH, dilationW, dilationH);
 
   THCudaCheck(cudaGetLastError());
 
