@@ -25,7 +25,7 @@ static int getGradParamsNumThreads(int batchSize){
 
 }
 
-template <typename T, typename AccT, typename IndexType, int kSize>
+template <typename T, typename AccT, typename IndexType, int kW, int kH>
 __global__ void spatialDepthwiseConvolutionUpdateOutput(
     const THCDeviceTensor<T, 4> input,
     THCDeviceTensor<T, 4> output,
@@ -37,13 +37,12 @@ __global__ void spatialDepthwiseConvolutionUpdateOutput(
     const int depthwiseMultiplier,
     const int inputWidth, const int inputHeight,
     const int outputWidth, const int outputHeight,
-    const int kernelWidth, const int kernelHeight,
     const int strideWidth, const int strideHeight,
     const int padWidth, const int padHeight,
     const int dilationWidth, const int dilationHeight)
 {
-  const int KW_LIMIT = (kSize !=0) ? kSize : kernelWidth;
-  const int KH_LIMIT = (kSize !=0) ? kSize : kernelHeight;
+  const int KW_LIMIT = kW;
+  const int KH_LIMIT = kH;
 
 
   for (IndexType linearIndex = blockIdx.x * blockDim.x + threadIdx.x;
